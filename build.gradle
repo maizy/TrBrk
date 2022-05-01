@@ -1,0 +1,52 @@
+plugins {
+    id 'java'
+    id 'scala'
+    id 'com.github.maiflai.scalatest' version '0.32'
+}
+
+group 'com.github.maizy'
+version '0.1-SNAPSHOT'
+sourceCompatibility = 11
+
+ext {
+    scalaMajorVersion = '2.12'
+    scalaMinorVersion = '15'
+    scalaVersion = "${scalaMajorVersion}.${scalaMinorVersion}"
+}
+
+
+allprojects {
+    apply plugin: 'java'
+    apply plugin: 'scala'
+
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        implementation "org.scala-lang:scala-library:${scalaVersion}"
+        implementation "org.scala-lang:scala-reflect:${scalaVersion}"
+
+        testImplementation "org.scalatest:scalatest_${scalaMajorVersion}:3.0.4"
+    }
+
+    tasks.withType(ScalaCompile) {
+        scalaCompileOptions.additionalParameters = [
+                '-Xlint:_',
+                '-feature',
+                '-Xfatal-warnings',
+                '-Ypartial-unification',
+                '-Ywarn-dead-code',
+                '-Ywarn-inaccessible',
+                '-Ywarn-infer-any',
+                '-Ywarn-nullary-override',
+                '-Ywarn-nullary-unit',
+                '-Ywarn-numeric-widen'
+        ]
+    }
+}
+
+project('trbrk') {
+    apply plugin: 'application'
+    mainClassName = 'com.github.maizy.trbrk.app.Main'
+}
