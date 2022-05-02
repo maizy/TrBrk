@@ -27,7 +27,7 @@ allprojects {
         implementation "org.scala-lang:scala-library:${scalaVersion}"
         implementation "org.scala-lang:scala-reflect:${scalaVersion}"
 
-        testImplementation "org.scalatest:scalatest_${scalaMajorVersion}:3.0.4"
+        testImplementation "org.scalatest:scalatest_${scalaMajorVersion}:3.2.11"
     }
 
     tasks.withType(ScalaCompile) {
@@ -48,5 +48,12 @@ allprojects {
 
 project('trbrk') {
     apply plugin: 'application'
-    mainClassName = 'com.github.maizy.trbrk.app.Main'
+
+    application {
+        mainClass = 'com.github.maizy.trbrk.app.Main'
+    }
+
+    dependencies {
+        implementation files('libs/jxinput-1.0.0.jar')
+    }
 }
