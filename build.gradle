@@ -12,6 +12,8 @@ ext {
     scalaMajorVersion = '2.12'
     scalaMinorVersion = '15'
     scalaVersion = "${scalaMajorVersion}.${scalaMinorVersion}"
+
+    nativeLibsDir = "$buildDir/libs/natives"
 }
 
 
@@ -23,11 +25,22 @@ allprojects {
         mavenCentral()
     }
 
+    configurations {
+        nativeBundle
+    }
+
     dependencies {
         implementation "org.scala-lang:scala-library:${scalaVersion}"
         implementation "org.scala-lang:scala-reflect:${scalaVersion}"
 
-        testImplementation "org.scalatest:scalatest_${scalaMajorVersion}:3.0.4"
+        testImplementation "org.scalatest:scalatest_${scalaMajorVersion}:3.2.11"
+    }
+
+    task extractNativeBundle(type: Sync) {
+        from {
+            configurations.nativeBundle.collect { zipTree(it) }
+        }
+        into file(project.nativeLibsDir)
     }
 
     tasks.withType(ScalaCompile) {
@@ -48,5 +61,18 @@ allprojects {
 
 project('trbrk') {
     apply plugin: 'application'
-    mainClassName = 'com.github.maizy.trbrk.app.Main'
+
+    application {
+        mainClass = 'com.github.maizy.trbrk.app.Main'
+        applicationDefaultJvmArgs = ["-Djava.library.path=${project.nativeLibsDir}"]
+    }
+
+    dependencies {
+        implementation 'net.java.jinput:jinput:2.0.9'
+        nativeBundle 'net.java.jinput:jinput:2.0.9:natives-all'
+
+        implementation files('libs/de.ralleytn.wrapper.microsoft.xinput-1.1.0.jar', 'libs/de.ralleytn.plugins.jinput.xinput-1.1.0.jar')
+    }
+
+    compileJava.dependsOn extractNativeBundle
 }
