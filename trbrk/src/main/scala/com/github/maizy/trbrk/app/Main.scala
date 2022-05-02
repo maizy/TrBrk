@@ -7,18 +7,41 @@ import org.knowm.xchart.XYChart
 import scala.util.Random
 
 final case class BrakePressurePoint(shiftMs: Double, percent: Double)
+final case class GraphData(var time: Array[Double], var realPercents: Array[Double], var expectedPercents: Array[Double])
+
+object GraphData {
+  // TODO: expected data should slide with real data
+  def fill(points: Int, stepMs: Int, expected: Array[Double], realFill: Double = 0.0): GraphData = {
+    require(expected.length == points)
+    val time = (0 until points).map { i => (i * stepMs).toDouble }.toArray
+    val real = Array.fill(points)(realFill)
+    GraphData(time, real, expected)
+  }
+}
 
 object Main {
 
   final private val POINTS = 50
+  final private val STEP_MS = 20
 
   private var lastPressure = Random.nextInt(100).toDouble
   private var fillPoint = 0
 
-  private val data: Array[Array[Double]] = Array(
-    Array.fill(POINTS)(0.0),
-    Array.fill(POINTS)(0.0),
-  )
+  private val expected: Array[Double] = {
+
+    val before = Array.fill(5)(0.0)
+    val top = Array.fill(10)(100.0)
+
+    val step = 100.0 / 20
+    val topToBottom = (1 to 20).map { i =>
+      100.0 - i * step
+    }.toArray
+
+    val profile = before ++ top ++ topToBottom
+    profile ++ Array.fill(POINTS - profile.length)(0.0)
+  }
+
+  private val data = GraphData.fill(POINTS, STEP_MS, expected)
 
   def main(args: Array[String]): Unit = {
 
@@ -26,7 +49,11 @@ object Main {
 
     // Create Chart
     val chart = QuickChart.getChart(
-      "Brake Pressure", "ms", "%", "real", data(0), data(1)
+      "Brake Pressure",
+      "ms", "%",
+      Array("real", "expected"),
+      data.time,
+      Array(data.realPercents, data.expectedPercents)
     )
 
     // Show it
@@ -38,7 +65,7 @@ object Main {
       Thread.sleep(50)
       updateChartData(phase)
       javax.swing.SwingUtilities.invokeLater { () =>
-          chart.updateXYSeries("real", data(0), data(1), null)
+          chart.updateXYSeries("real", data.time, data.realPercents, null)
           sw.repaintChart()
       }
     }
@@ -54,15 +81,15 @@ object Main {
 
   private def updateChartData(phase: Int): Unit = {
     if (fillPoint >= POINTS - 1) {
-      data(0) = shiftArray(data(0))
-      data(1) = shiftArray(data(1))
+      data.time = shiftArray(data.time)
+      data.realPercents = shiftArray(data.realPercents)
     } else {
       fillPoint += 1
     }
 
     val newData = getData(phase)
-    data(0)(fillPoint) = newData.shiftMs
-    data(1)(fillPoint) = newData.percent
+    data.time(fillPoint) = newData.shiftMs
+    data.realPercents(fillPoint) = newData.percent
   }
 
   private def shiftArray(a: Array[Double], fill: Double = 0.0): Array[Double] = {
