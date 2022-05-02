@@ -18,6 +18,7 @@ ext {
 allprojects {
     apply plugin: 'java'
     apply plugin: 'scala'
+    apply plugin: 'com.github.maiflai.scalatest'
 
     repositories {
         mavenCentral()
@@ -28,6 +29,7 @@ allprojects {
         implementation "org.scala-lang:scala-reflect:${scalaVersion}"
 
         testImplementation "org.scalatest:scalatest_${scalaMajorVersion}:3.2.11"
+        testImplementation 'com.vladsch.flexmark:flexmark-all:0.64.0'
     }
 
     tasks.withType(ScalaCompile) {
