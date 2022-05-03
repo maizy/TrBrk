@@ -1,0 +1,13 @@
+<configuration debug="true">
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%gray(%d{HH:mm:ss.SSS}) %highlight(%.-1level) [%cyan(%logger)]: %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="com.github.maizy.trbrk" level="TRACE"/>
+
+    <root level="DEBUG">
+        <appender-ref ref="STDOUT"/>
+    </root>
+</configuration>

@@ -28,6 +28,9 @@ allprojects {
         implementation "org.scala-lang:scala-library:${scalaVersion}"
         implementation "org.scala-lang:scala-reflect:${scalaVersion}"
 
+        implementation "ch.qos.logback:logback-classic:1.2.10"
+        implementation "com.typesafe.scala-logging:scala-logging_${scalaMajorVersion}:3.9.4"
+
         testImplementation "org.scalatest:scalatest_${scalaMajorVersion}:3.2.11"
         testImplementation 'com.vladsch.flexmark:flexmark-all:0.64.0'
     }
